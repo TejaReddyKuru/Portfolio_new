@@ -1,44 +1,81 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, ExternalLink, Activity } from 'lucide-react';
-
-const projects = [
-  {
-    title: "Farmer Portal – Scheme Eligibility System",
-    description: "A web application helping farmers instantly check eligibility for government welfare schemes with simple UI for rural users.",
-    image: "assets/photos/farmer_portal.jpg",
-    tags: ["PHP", "MySQL", "HTML", "CSS"],
-    category: "Full Stack",
-    github: "https://github.com/tejagadugreat/farmer_portel.git",
-    live: "#",
-    features: ["Scheme matching logic", "Farmer data processing", "Simple UI"],
-  },
-  {
-    title: "Mitai Garage – Sweets E-Commerce",
-    description: "Full stack e-commerce platform for a sweets business allowing online ordering and secure payments.",
-    image: "assets/photos/mitai_garage.png",
-    tags: ["Node.js", "Express.js", "JavaScript", "HTML/CSS", "Payment"],
-    category: "Full Stack",
-    github: "https://github.com/tejagadugreat/sweets-ecom.git",
-    live: "#",
-    features: ["Product browsing", "Online ordering", "Secure payments", "REST APIs"],
-  },
-  {
-    title: "Crave \u2013 Food Delivery Platform",
-    description: "A premium food delivery web application built for a recurring client. Features intuitive restaurant browsing, cart management, and a sleek modern UI.",
-    image: "assets/photos/crave_delivery.jpg",
-    tags: ["React.js", "TailwindCSS", "Node.js", "Express.js", "Stripe"],
-    category: "Full Stack",
-    github: "#",
-    live: "#",
-    features: ["On-demand delivery tracking", "Secure payments", "Restaurant dashboard"],
-  },
-];
 
 const filters = ["All", "Full Stack", "Frontend", "Backend"];
 
 export default function Projects() {
   const [activeFilter, setActiveFilter] = useState("All");
+  const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('https://api.github.com/users/TejaReddyKuru/repos?sort=updated&per_page=15')
+      .then(res => res.json())
+      .then(data => {
+        const specialProjects = [
+          {
+            title: "Gamify ECO-LEARNER",
+            description: "A web platform for gamifying the learning experience for students on environmental science.",
+            image: "https://opengraph.githubassets.com/1/TejaReddyKuru/Gamify_ECO-LEARNER",
+            tags: ["JavaScript", "Frontend"],
+            category: "Frontend",
+            github: "https://github.com/TejaReddyKuru/Gamify_ECO-LEARNER",
+            live: "https://gamify-eco-learner-hwwp.vercel.app/",
+            features: ["⭐ Featured Project", "Gamified Learning", "Live on Vercel"]
+          },
+          {
+            title: "Swepper",
+            description: "Modern platform and services - Swepper.",
+            image: "https://opengraph.githubassets.com/1/TejaReddyKuru/Swepper.com",
+            tags: ["JavaScript", "React"],
+            category: "Frontend",
+            github: "https://github.com/TejaReddyKuru/Swepper.com",
+            live: "https://swepper-com.vercel.app/",
+            features: ["⭐ Featured Project", "Modern UI", "Live on Vercel"]
+          },
+          {
+            title: "VantixTech",
+            description: "Official website and tech solutions for VantixTech.",
+            image: "https://ui-avatars.com/api/?name=VantixTech&background=fb923c&color=fff&size=512",
+            tags: ["Web", "Full Stack"],
+            category: "Full Stack",
+            github: "https://github.com/TejaReddyKuru/vantixtech", 
+            live: "https://vantixtech.vercel.app/",
+            features: ["⭐ Featured Project", "Live on Vercel"]
+          }
+        ];
+
+        const specialRepoNames = ["Gamify_ECO-LEARNER", "Swepper.com", "vantixtech"];
+        
+        const fetchedProjects = data
+          .filter(repo => !specialRepoNames.some(s => repo.name.toLowerCase().includes(s.toLowerCase())))
+          .map(repo => {
+            let category = "All";
+            if (repo.language === "JavaScript" || repo.language === "TypeScript") category = "Frontend";
+            else if (repo.language === "Python" || repo.language === "PHP" || repo.language === "Java") category = "Backend";
+            else if (repo.language === "HTML" || repo.language === "CSS") category = "Frontend";
+            
+            return {
+              title: repo.name.replace(/[-_]/g, ' '),
+              description: repo.description || "No description available.",
+              image: `https://opengraph.githubassets.com/1/TejaReddyKuru/${repo.name}`,
+              tags: repo.language ? [repo.language] : [],
+              category: category,
+              github: repo.html_url,
+              live: repo.homepage || "#",
+              features: ["Fetched dynamically from GitHub", `Stars: ${repo.stargazers_count}`, `Forks: ${repo.forks_count}`]
+            };
+          });
+
+        setProjects([...specialProjects, ...fetchedProjects]);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching repos:", err);
+        setIsLoading(false);
+      });
+  }, []);
 
   const filteredProjects = projects.filter(
     (project) => activeFilter === "All" || project.category === activeFilter
