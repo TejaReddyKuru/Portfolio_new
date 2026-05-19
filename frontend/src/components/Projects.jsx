@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, ExternalLink, Activity } from 'lucide-react';
 
-const filters = ["All", "Full Stack", "Frontend", "Backend"];
+const filters = ["All", "Live Projects", "Full Stack", "Frontend", "Backend"];
 
 export default function Projects() {
   const [activeFilter, setActiveFilter] = useState("All");
@@ -77,9 +77,11 @@ export default function Projects() {
       });
   }, []);
 
-  const filteredProjects = projects.filter(
-    (project) => activeFilter === "All" || project.category === activeFilter
-  );
+  const filteredProjects = projects.filter((project) => {
+    if (activeFilter === "All") return true;
+    if (activeFilter === "Live Projects") return project.live && project.live !== "#";
+    return project.category === activeFilter;
+  });
 
   return (
     <section id="projects" className="py-24 relative bg-white dark:bg-[#050505] min-h-screen transition-colors duration-500">
