@@ -16,13 +16,9 @@ import { ArrowUp } from 'lucide-react';
 
 
 function App() {
-  const [loading, setLoading] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
 
     const handleScroll = () => {
       if (window.scrollY > 500) {
@@ -34,7 +30,6 @@ function App() {
 
     window.addEventListener('scroll', handleScroll);
     return () => {
-      clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
@@ -42,18 +37,6 @@ function App() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  if (loading) {
-    return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#050505]">
-        <motion.div
-          animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-          transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-16 h-16 border-4 border-t-purple-600 border-b-blue-600 rounded-full"
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen relative text-gray-200 transition-colors duration-500">
