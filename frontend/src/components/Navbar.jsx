@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Hexagon } from 'lucide-react';
 
 const leftSections = ['Home', 'About', 'Skills'];
-const rightSections = ['Projects', 'Experience', 'Contact'];
+const rightSections = ['Projects', 'Live Projects', 'Experience', 'Contact'];
 const allSections = [...leftSections, ...rightSections];
 
 export default function Navbar() {
@@ -16,7 +16,8 @@ export default function Navbar() {
       setScrolled(window.scrollY > 20);
       
       const current = allSections.find(section => {
-        const element = document.getElementById(section.toLowerCase());
+        const targetId = section === 'Live Projects' ? 'projects' : section.toLowerCase();
+        const element = document.getElementById(targetId);
         if (element) {
           const rect = element.getBoundingClientRect();
           return rect.top >= -100 && rect.top <= 200;
@@ -31,13 +32,20 @@ export default function Navbar() {
   }, []);
 
   const scrollToSection = (section) => {
-    const element = document.getElementById(section.toLowerCase());
+    const targetId = section === 'Live Projects' ? 'projects' : section.toLowerCase();
+    const element = document.getElementById(targetId);
     if (element) {
       const top = element.getBoundingClientRect().top + window.scrollY - 80;
       window.scrollTo({ top, behavior: 'smooth' });
     }
     setActive(section);
     setIsOpen(false);
+    
+    if (section === 'Live Projects') {
+       window.dispatchEvent(new CustomEvent('filterProjects', { detail: 'Live Projects' }));
+    } else if (section === 'Projects') {
+       window.dispatchEvent(new CustomEvent('filterProjects', { detail: 'All' }));
+    }
   };
 
   return (

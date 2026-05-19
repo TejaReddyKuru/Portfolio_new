@@ -77,6 +77,14 @@ export default function Projects() {
       });
   }, []);
 
+  useEffect(() => {
+    const handleFilterChange = (e) => {
+      setActiveFilter(e.detail);
+    };
+    window.addEventListener('filterProjects', handleFilterChange);
+    return () => window.removeEventListener('filterProjects', handleFilterChange);
+  }, []);
+
   const filteredProjects = projects.filter((project) => {
     if (activeFilter === "All") return true;
     if (activeFilter === "Live Projects") return project.live && project.live !== "#";
