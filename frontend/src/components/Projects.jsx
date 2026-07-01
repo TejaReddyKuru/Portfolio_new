@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, ExternalLink, Activity } from 'lucide-react';
 
-const filters = ["All", "Live Projects", "Full Stack", "Frontend", "Backend"];
+const filters = ["All", "Live Projects", "Full Stack"];
 
 const specialProjects = [
   {
