@@ -43,46 +43,70 @@ export default function Projects() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://api.github.com/users/TejaReddyKuru/repos?sort=updated&per_page=15')
-      .then(res => res.json())
-      .then(data => {
-        if (!Array.isArray(data)) {
-          console.error("GitHub API Error:", data.message || "Failed to fetch repos array");
-          setProjects(specialProjects);
-          setIsLoading(false);
-          return;
-        }
-
-        const specialRepoNames = ["Gamify_ECO-LEARNER", "Swepper.com", "vantixtech"];
+    const fetchAllRepos = async () => {
+      try {
+        let page = 1;
+        let allRepos = [];
+        let keepFetching = true;
         
-        const fetchedProjects = data
-          .filter(repo => !specialRepoNames.some(s => repo.name.toLowerCase().includes(s.toLowerCase())))
-          .map(repo => {
-            let category = "All";
-            if (repo.language === "JavaScript" || repo.language === "TypeScript") category = "Frontend";
-            else if (repo.language === "Python" || repo.language === "PHP" || repo.language === "Java") category = "Backend";
-            else if (repo.language === "HTML" || repo.language === "CSS") category = "Frontend";
+        while (keepFetching) {
+          const res = await fetch(`https://api.github.com/users/TejaReddyKuru/repos?sort=updated&per_page=100&page=${page}`);
+          const data = await res.json();
+          
+          if (!Array.isArray(data)) {
+            if (page === 1) {
+              console.error("GitHub API Error:", data.message || "Failed to fetch repos array");
+              setProjects(specialProjects);
+              setIsLoading(false);
+            }
+            break;
+          }
+          
+          if (data.length === 0) {
+            keepFetching = false;
+            break;
+          }
+          
+          allRepos = [...allRepos, ...data];
+          page++;
+        }
+        
+        if (allRepos.length > 0) {
+          const specialRepoNames = ["Gamify_ECO-LEARNER", "Swepper.com", "vantixtech"];
+          
+          const fetchedProjects = allRepos
+            .filter(repo => !specialRepoNames.some(s => repo.name.toLowerCase().includes(s.toLowerCase())))
+            .map(repo => {
+              let category = "Other";
+              const lang = repo.language;
+              if (lang) {
+                if (["JavaScript", "TypeScript", "HTML", "CSS", "Vue", "Svelte", "React"].includes(lang)) category = "Frontend";
+                else if (["Python", "PHP", "Java", "C++", "C#", "Go", "Ruby", "Rust", "C", "Jupyter Notebook"].includes(lang)) category = "Backend";
+              }
+              
+              return {
+                title: repo.name.replace(/[-_]/g, ' '),
+                description: repo.description || "No description available.",
+                image: `https://opengraph.githubassets.com/1/TejaReddyKuru/${repo.name}`,
+                tags: lang ? [lang] : [],
+                category: category,
+                github: repo.html_url,
+                live: repo.homepage || "#",
+                features: ["Fetched dynamically from GitHub", `Stars: ${repo.stargazers_count}`, `Forks: ${repo.forks_count}`]
+              };
+            });
             
-            return {
-              title: repo.name.replace(/[-_]/g, ' '),
-              description: repo.description || "No description available.",
-              image: `https://opengraph.githubassets.com/1/TejaReddyKuru/${repo.name}`,
-              tags: repo.language ? [repo.language] : [],
-              category: category,
-              github: repo.html_url,
-              live: repo.homepage || "#",
-              features: ["Fetched dynamically from GitHub", `Stars: ${repo.stargazers_count}`, `Forks: ${repo.forks_count}`]
-            };
-          });
-
-        setProjects([...specialProjects, ...fetchedProjects]);
-        setIsLoading(false);
-      })
-      .catch(err => {
+          setProjects([...specialProjects, ...fetchedProjects]);
+          setIsLoading(false);
+        }
+      } catch (err) {
         console.error("Error fetching repos:", err);
         setProjects(specialProjects);
         setIsLoading(false);
-      });
+      }
+    };
+    
+    fetchAllRepos();
   }, []);
 
   useEffect(() => {
