@@ -4,47 +4,54 @@ import { Github, ExternalLink, Activity } from 'lucide-react';
 
 const filters = ["All", "Live Projects", "Full Stack", "Frontend", "Backend"];
 
+const specialProjects = [
+  {
+    title: "Gamify ECO-LEARNER",
+    description: "A web platform for gamifying the learning experience for students on environmental science.",
+    image: "https://opengraph.githubassets.com/1/TejaReddyKuru/Gamify_ECO-LEARNER",
+    tags: ["JavaScript", "Frontend"],
+    category: "Frontend",
+    github: "https://github.com/TejaReddyKuru/Gamify_ECO-LEARNER",
+    live: "https://gamify-eco-learner-hwwp.vercel.app/",
+    features: ["⭐ Featured Project", "Gamified Learning", "Live on Vercel"]
+  },
+  {
+    title: "Swepper",
+    description: "Modern platform and services - Swepper.",
+    image: "https://opengraph.githubassets.com/1/TejaReddyKuru/Swepper.com",
+    tags: ["JavaScript", "React"],
+    category: "Frontend",
+    github: "https://github.com/TejaReddyKuru/Swepper.com",
+    live: "https://swepper-com.vercel.app/",
+    features: ["⭐ Featured Project", "Modern UI", "Live on Vercel"]
+  },
+  {
+    title: "VantixTech",
+    description: "Official website and tech solutions for VantixTech.",
+    image: "https://ui-avatars.com/api/?name=VantixTech&background=fb923c&color=fff&size=512",
+    tags: ["Web", "Full Stack"],
+    category: "Full Stack",
+    github: "https://github.com/TejaReddyKuru/vantixtech", 
+    live: "https://vantixtech.vercel.app/",
+    features: ["⭐ Featured Project", "Live on Vercel"]
+  }
+];
+
 export default function Projects() {
   const [activeFilter, setActiveFilter] = useState("All");
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(specialProjects);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch('https://api.github.com/users/TejaReddyKuru/repos?sort=updated&per_page=15')
       .then(res => res.json())
       .then(data => {
-        const specialProjects = [
-          {
-            title: "Gamify ECO-LEARNER",
-            description: "A web platform for gamifying the learning experience for students on environmental science.",
-            image: "https://opengraph.githubassets.com/1/TejaReddyKuru/Gamify_ECO-LEARNER",
-            tags: ["JavaScript", "Frontend"],
-            category: "Frontend",
-            github: "https://github.com/TejaReddyKuru/Gamify_ECO-LEARNER",
-            live: "https://gamify-eco-learner-hwwp.vercel.app/",
-            features: ["⭐ Featured Project", "Gamified Learning", "Live on Vercel"]
-          },
-          {
-            title: "Swepper",
-            description: "Modern platform and services - Swepper.",
-            image: "https://opengraph.githubassets.com/1/TejaReddyKuru/Swepper.com",
-            tags: ["JavaScript", "React"],
-            category: "Frontend",
-            github: "https://github.com/TejaReddyKuru/Swepper.com",
-            live: "https://swepper-com.vercel.app/",
-            features: ["⭐ Featured Project", "Modern UI", "Live on Vercel"]
-          },
-          {
-            title: "VantixTech",
-            description: "Official website and tech solutions for VantixTech.",
-            image: "https://ui-avatars.com/api/?name=VantixTech&background=fb923c&color=fff&size=512",
-            tags: ["Web", "Full Stack"],
-            category: "Full Stack",
-            github: "https://github.com/TejaReddyKuru/vantixtech", 
-            live: "https://vantixtech.vercel.app/",
-            features: ["⭐ Featured Project", "Live on Vercel"]
-          }
-        ];
+        if (!Array.isArray(data)) {
+          console.error("GitHub API Error:", data.message || "Failed to fetch repos array");
+          setProjects(specialProjects);
+          setIsLoading(false);
+          return;
+        }
 
         const specialRepoNames = ["Gamify_ECO-LEARNER", "Swepper.com", "vantixtech"];
         
@@ -73,6 +80,7 @@ export default function Projects() {
       })
       .catch(err => {
         console.error("Error fetching repos:", err);
+        setProjects(specialProjects);
         setIsLoading(false);
       });
   }, []);
